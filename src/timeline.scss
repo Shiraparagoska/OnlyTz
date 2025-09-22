@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=PT+Sans:wght@700&display=swap');
+
+.timeline {
+  margin-top: 24px;
+  padding: 16px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background-color: #f4f5f9;
+}
+.timeline__title {
+  margin: 0;
+  color: #42567a;
+  font-family: 'PT Sans', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 56px;
+  line-height: 120%;
+  letter-spacing: 0;
+}
+.timeline__years {
+  position: relative;
+  margin-top: 16px;
+  min-height: 120px;
+}
+.timeline__year {
+  position: absolute;
+  top: 0;
+  font-family: 'PT Sans', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 160px;
+  line-height: 160px;
+  letter-spacing: -0.02em;
+}
+.timeline__year--left {
+  left: 0;
+  color: #5d5fef;
+}
+.timeline__year--right {
+  right: 0;
+  color: #ef5da8;
+}
+.timeline__circle {
+  position: relative;
+  margin: 24px auto 0;
+  width: min(92vw, 800px);
+  aspect-ratio: 1 / 1;
+}
+/* Слои круга и точек */
+.timeline__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+.timeline__ring {
+  fill: none;
+  stroke: #42567a;
+  opacity: 0.4;
+  stroke-width: 1;
+}
+.timeline__dots {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.timeline__dot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #42567a;
+  display: block;
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.timeline__dot:hover,
+.timeline__dot.is-active {
+  background: transparent;
+}
+.timeline__dot:hover::after,
+.timeline__dot.is-active::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 56px;
+  height: 56px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #f4f5f9;
+  border: 1px solid rgba(48, 62, 88, 0.5);
+  pointer-events: none;
+}
