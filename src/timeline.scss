@@ -5,7 +5,7 @@
   padding: 16px;
   border: 1px solid #e5e5e5;
   border-radius: 8px;
-  background-color: #f4f5f9;
+  background-color: #F4F5F9;
 }
 .timeline__title {
   margin: 0;
@@ -54,7 +54,7 @@
 }
 .timeline__ring {
   fill: none;
-  stroke: #42567a;
+  stroke: #42567A; 
   opacity: 0.4;
   stroke-width: 1;
 }
@@ -64,19 +64,19 @@
   z-index: 1;
   pointer-events: none;
 }
-
 .timeline__dot {
   position: absolute;
   transform: translate(-50%, -50%);
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #42567a;
+  background: #42567A; 
   display: block;
-  pointer-events: auto;
+  pointer-events: auto; 
   cursor: pointer;
-  z-index: 2;
+  z-index: 2; 
 }
+
 
 .timeline__dot:hover,
 .timeline__dot.is-active {
@@ -92,7 +92,7 @@
   height: 56px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: #f4f5f9;
+  background: #F4F5F9;
   border: 1px solid rgba(48, 62, 88, 0.5);
   pointer-events: none;
 }
