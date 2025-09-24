@@ -1,28 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 
-/* Фон страницы */
+
 body {
   margin: 0;
-  background: #f4f5f9; /* как в макете */
+  background: #f4f5f9; 
   color: #42567a;
 }
-/* Базовая секция и переменные лейаута */
+
 .timeline {
   min-height: 100vh;
   padding: 40px 24px;
-  /* ширина композиции и масштаб круга */
+
   --layout: min(1440px, calc(100vw - 48px));
-  --circle: calc(var(--layout) * 0.417); /* коэффициент под твой текущий круг */
-  --stage-top: clamp(40px, 8vh, 170px); /* ОДНА точка привязки для заголовка и круга */
+  --circle: calc(var(--layout) * 0.417);
+  --stage-top: clamp(40px, 8vh, 170px);
   --years-shift: -8%;
   --years-gap: calc(var(--circle) * 0.036);
-  /* общий левый отступ для title и слайдера */
+
   --title-left: clamp(16px, 3vw, 110px);
 }
 
 .timeline__container {
-  position: relative; /* привязка title к сцене */
+  position: relative; 
   width: var(--layout);
   margin: 0 auto;
 }
@@ -33,17 +33,17 @@ body {
   font-size: 25px;
   line-height: 120%;
   letter-spacing: 0;
-  color: #3877ee; /* “синий” из макета */
+  color: #3877ee; 
   margin: 0 0 8px;
 }
 
-/* Маркер прижат к левому краю лейаута (контейнера) */
+
 .timeline__container::before {
   content: '';
   position: absolute;
-  left: 0; /* всегда ровно по лейауту */
+  left: 0; 
   top: var(--stage-top);
-  transform: translateY(calc(-50% - 10%)); /* синхронизирован с title */
+  transform: translateY(calc(-50% - 10%)); 
   width: 5px;
   height: clamp(80px, 11vh, 120px);
   border-radius: 2.5px;
@@ -51,7 +51,7 @@ body {
   pointer-events: none;
 }
 
-/* Заголовок */
+
 .timeline__title {
   position: absolute;
   left: var(--title-left);
@@ -67,12 +67,12 @@ body {
   width: clamp(220px, 24vw, 350px);
 }
 
-/* Отключаем старый маркер у заголовка, чтобы не дублировался */
+
 .timeline__title::before {
   display: none !important;
 }
 
-/* Сцена: квадрат под круг/точки/годы */
+
 .timeline__stage {
   position: relative;
   width: var(--circle);
@@ -80,7 +80,7 @@ body {
   margin: var(--stage-top) auto 0;
 }
 
-/* Круг */
+
 .timeline__circle {
   position: absolute;
   inset: 0;
@@ -98,7 +98,7 @@ body {
   stroke-width: 2;
 }
 
-/* Годы */
+
 .timeline__years {
   position: absolute;
   left: 50%;
@@ -128,7 +128,7 @@ body {
   color: #ef5da8;
 }
 
-/* Точки */
+
 .timeline__dots {
   position: absolute;
   inset: 0;
@@ -136,17 +136,35 @@ body {
   pointer-events: none;
 }
 .timeline__dot {
-  position: absolute;
+  position: absolute; 
   transform: translate(-50%, -50%);
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: #303e58;
-  display: block;
+  display: grid;
+  place-items: center;
   cursor: pointer;
   pointer-events: auto;
   z-index: 2;
 }
+
+
+.timeline__dot-num {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  font-family: 'PT Sans', system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: 0;
+  color: #42567a;
+  pointer-events: none;
+}
+
 .timeline__dot.is-active,
 .timeline__dot:hover {
   background: #f4f5f9;
@@ -164,6 +182,12 @@ body {
   background: #f4f5f9;
   border: 1px solid rgba(48, 62, 88, 0.5);
   pointer-events: none;
+  z-index: 0; 
+}
+
+
+.timeline__dot:hover {
+  background: #f5f5f5;
 }
 
 .timeline__slider {
@@ -178,19 +202,18 @@ body {
   height: 135px;
 }
 
-/* Swiper: размеры слайдов 300–400 по ширине и 135 по высоте */
+
 .timeline-swiper .swiper-slide {
   width: clamp(300px, 27.8vw, 400px) !important;
   height: 135px !important;
   flex-shrink: 0;
 }
 
-/* Карточка события: фон как у body, контент сверху слева */
+
 .event-card {
   width: 100%;
   height: 135px;
-  background: #f5f5f5; /* как body */
-  padding: 12px 16px; /* почти прижато к левому верхнему краю */
+  padding: 12px 16px; 
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -198,7 +221,7 @@ body {
   box-shadow: none;
 }
 
-/* Год в левом верхнем */
+
 .event-card__year {
   font-family: 'Bebas Neue', system-ui, sans-serif;
   font-weight: 400;
@@ -209,7 +232,7 @@ body {
   margin: 0 0 8px;
 }
 
-/* Описание */
+
 .event-card__text {
   font-family: 'PT Sans', system-ui, sans-serif;
   font-weight: 400;
@@ -221,10 +244,101 @@ body {
   max-width: 100%;
 }
 
-/* Слайдер: тот же левый отступ, что у title */
+
 .timeline__container .timeline__slider {
   position: relative;
   left: var(--title-left);
   width: calc(100% - (var(--title-left) * 2));
-  margin: clamp(24px, 5vh, 80px) 0 0; /* отступ сверху от сцены/заголовка */
+  margin: clamp(24px, 5vh, 80px) 0 0; 
+}
+
+
+.timeline__switcher {
+  position: relative;
+  left: var(--title-left);
+  width: calc(100% - (var(--title-left) * 2));
+  margin: clamp(16px, 3vh, 24px) 0 0;
+  display: flex;
+  flex-direction: column; 
+  align-items: flex-start;
+  gap: 8px;
+}
+.timeline__switcher-num {
+  font-family: 'PT Sans', system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1;
+  color: #42567a;
+  opacity: 0.8;
+}
+.timeline__switcher-controls {
+  display: flex;
+  gap: 8px;
+}
+.timeline__switcher-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f4f5f9;
+  border: 1px solid rgba(48, 62, 88, 0.2);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    transform 0.1s;
+}
+.timeline__switcher-btn:hover {
+  background: #fff;
+  border-color: rgba(48, 62, 88, 0.35);
+}
+.timeline__switcher-btn:active {
+  transform: scale(0.96);
+}
+.timeline__switcher-btn:disabled {
+  opacity: 0.5;
+  filter: saturate(50%);
+}
+
+
+.timeline__slider-wrap {
+  position: relative;
+  left: var(--title-left);
+  width: calc(100% - (var(--title-left) * 2));
+  margin-top: clamp(12px, 3vh, 24px);
+}
+.timeline-slider-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #f4f5f9;
+  border: 1px solid rgba(48, 62, 88, 0.2);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    transform 0.1s;
+  z-index: 2;
+}
+.timeline-slider-prev {
+  left: -56px;
+}
+.timeline-slider-next {
+  right: -56px;
+}
+.timeline-slider-nav:hover {
+  background: #fff;
+  border-color: rgba(48, 62, 88, 0.35);
+}
+.timeline-slider-nav:active {
+  transform: translateY(-50%) scale(0.96);
+}
+.timeline-slider-nav:disabled {
+  opacity: 0.5;
 }

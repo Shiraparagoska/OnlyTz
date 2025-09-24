@@ -1,5 +1,6 @@
 import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import type { Swiper as SwiperInstance } from 'swiper';
 import { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './timeline.scss';
@@ -92,54 +93,172 @@ function App() {
 
   const [activeIndex, setActiveIndex] = useState(0);
 
+  const total = pts.length;
+  const isFirst = activeIndex === 0;
+  const isLast = activeIndex === total - 1;
+
+  const goPrev = () => setActiveIndex((i) => (i - 1 + pts.length) % pts.length);
+  const goNext = () => setActiveIndex((i) => (i + 1) % pts.length);
+
+  // управление слайдером событий
+  const sliderRef = React.useRef<SwiperInstance | null>(null);
+  const [isBegin, setIsBegin] = useState(true);
+  const [isEnd, setIsEnd] = useState(false);
+  const bindEdges = (sw?: SwiperInstance | null) => {
+    if (!sw) return;
+    setIsBegin(sw.isBeginning);
+    setIsEnd(sw.isEnd);
+  };
+
   return (
-      <section className="timeline" aria-labelledby="timeline-title">
-        <div className="timeline__container">
+    <section className="timeline" aria-labelledby="timeline-title">
+      <div className="timeline__container">
         <h2 id="timeline-title" className="timeline__title">
           Исторические даты
         </h2>
         <div className="timeline__stage">
-        <div className="timeline__years">
-          <span className="timeline__year timeline__year--left">{periods[activeIndex].from}</span>
-          <span className="timeline__year timeline__year--right">{periods[activeIndex].to}</span>
-        </div>
-        <div className="timeline__circle">
-          <svg className="timeline__svg" viewBox="0 0 800 800">
-            <circle className="timeline__ring" cx="400" cy="400" r="300" />
-          </svg>
-          <div className="timeline__dots">
-            {pts.map((p, i) => (
-              <span
-                key={i}
-                className="timeline__dot"
-                style={{ left: `${(p.x / 800) * 100}%`, top: `${(p.y / 800) * 100}%` }}
-                onClick={() => setActiveIndex(i)}
-              />
-            ))}
+          <div className="timeline__years">
+            <span className="timeline__year timeline__year--left">{periods[activeIndex].from}</span>
+            <span className="timeline__year timeline__year--right">{periods[activeIndex].to}</span>
           </div>
+          <div className="timeline__circle">
+            <svg className="timeline__svg" viewBox="0 0 800 800">
+              <circle className="timeline__ring" cx="400" cy="400" r="300" />
+            </svg>
+            <div className="timeline__dots">
+              {pts.map((p, i) => (
+                <span
+                  key={i}
+                  className={`timeline__dot ${i === activeIndex ? 'is-active' : ''}`}
+                  style={{ left: `${(p.x / 800) * 100}%`, top: `${(p.y / 800) * 100}%` }}
+                  onClick={() => setActiveIndex(i)}
+                >
+                  {i === activeIndex && (
+                    <span className="timeline__dot-num">{String(i + 1).padStart(2, '0')}</span>
+                  )}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
-        <div className="timeline__slider">
-          <Swiper
-            spaceBetween={100}
-            slidesPerView={3}
-            centeredSlides={true}
-            navigation={true}
-            pagination={{ clickable: true }}
-            className="timeline-swiper"
+
+        {/* Переключатель периодов над карточками */}
+        <div className="timeline__switcher" role="group" aria-label="Переключение периода">
+          <div className="timeline__switcher-num">{`${String(activeIndex + 1).padStart(2, '0')}/${String(periods.length).padStart(2, '0')}`}</div>
+          <div className="timeline__switcher-controls">
+            <button
+              type="button"
+              className="timeline__switcher-btn"
+              aria-label="Предыдущий период"
+              onClick={goPrev}
+              disabled={activeIndex === 0}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden>
+                <path
+                  d="M15 18l-6-6 6-6"
+                  fill="none"
+                  stroke="#303e58"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+            <button
+              type="button"
+              className="timeline__switcher-btn"
+              aria-label="Следующий период"
+              onClick={goNext}
+              disabled={activeIndex === periods.length - 1}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden>
+                <path
+                  d="M9 6l6 6-6 6"
+                  fill="none"
+                  stroke="#303e58"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Внешние кнопки для слайдера слева/справа от его области */}
+        <div className="timeline__slider-wrap">
+          <button
+            type="button"
+            className="timeline-slider-nav timeline-slider-prev"
+            aria-label="Назад"
+            disabled={isBegin}
+            onClick={() => sliderRef.current?.slidePrev()}
           >
-            {periods[activeIndex].events.map((event, i) => (
-              <SwiperSlide key={i}>
-                <div className="event-card">
-                  <div className="event-card__year">{event.year}</div>
-                  <p className="event-card__text"> {event.text}</p>
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden>
+              <path
+                d="M15 18l-6-6 6-6"
+                fill="none"
+                stroke="#303e58"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+
+          <div className="timeline__slider">
+            <Swiper
+              key={activeIndex} 
+              spaceBetween={100}
+              slidesPerView={'auto'}
+              slidesPerGroup={1}
+              centeredSlides={false}
+              watchOverflow={true}
+              observer={true}
+              observeParents={true}
+              slidesOffsetBefore={0}
+              slidesOffsetAfter={0}
+              onSwiper={(sw) => {
+                sliderRef.current = sw;
+                bindEdges(sw);
+              }}
+              onSlideChange={(sw) => bindEdges(sw)}
+              navigation={{ prevEl: '.timeline-slider-prev', nextEl: '.timeline-slider-next' }}
+              pagination={{ clickable: true }}
+              className="timeline-swiper"
+            >
+              {periods[activeIndex].events.map((event, i) => (
+                <SwiperSlide key={i}>
+                  <div className="event-card">
+                    <div className="event-card__year">{event.year}</div>
+                    <p className="event-card__text"> {event.text}</p>
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
+
+          <button
+            type="button"
+            className="timeline-slider-nav timeline-slider-next"
+            aria-label="Вперёд"
+            disabled={isEnd}
+            onClick={() => sliderRef.current?.slideNext()}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden>
+              <path
+                d="M9 6l6 6-6 6"
+                fill="none"
+                stroke="#303e58"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
         </div>
-        </div>
-      </section>
+      </div>
+    </section>
   );
 }
 
