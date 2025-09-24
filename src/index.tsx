@@ -1,10 +1,11 @@
 import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import type { Swiper as SwiperInstance } from 'swiper';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import './timeline.scss';
 import 'swiper/css';
+import gsap from 'gsap';
 
 const toRad = (deg: number) => (deg * Math.PI) / 180;
 const circlePoints = (n: number, cx: number, cy: number, r: number, startDeg = -90) =>
@@ -101,7 +102,7 @@ function App() {
   const goNext = () => setActiveIndex((i) => (i + 1) % pts.length);
 
   // управление слайдером событий
-  const sliderRef = React.useRef<SwiperInstance | null>(null);
+  const sliderRef = useRef<SwiperInstance | null>(null);
   const [isBegin, setIsBegin] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
   const bindEdges = (sw?: SwiperInstance | null) => {
@@ -110,22 +111,99 @@ function App() {
     setIsEnd(sw.isEnd);
   };
 
+  // GSAP: плавный пересчёт лет
+  const leftYearRef = useRef<HTMLSpanElement | null>(null);
+  const rightYearRef = useRef<HTMLSpanElement | null>(null);
+  const yearFrom = useRef<{ v: number }>({ v: periods[0].from });
+  const yearTo = useRef<{ v: number }>({ v: periods[0].to });
+
+  useEffect(() => {
+    const leftEl = leftYearRef.current;
+    const rightEl = rightYearRef.current;
+    if (!leftEl || !rightEl) return;
+
+    const tl = gsap.timeline({ defaults: { ease: 'none' } });
+    tl.to(
+      yearFrom.current,
+      {
+        v: periods[activeIndex].from,
+        duration: 0.6,
+        onUpdate: () => {
+          if (leftEl) {
+            leftEl.textContent = String(Math.round(yearFrom.current.v));
+          }
+        },
+      },
+      0,
+    );
+    tl.to(
+      yearTo.current,
+      {
+        v: periods[activeIndex].to,
+        duration: 0.6,
+        onUpdate: () => {
+          if (rightEl) {
+            rightEl.textContent = String(Math.round(yearTo.current.v));
+          }
+        },
+      },
+      0,
+    );
+
+    return () => {
+      tl.kill();
+    };
+  }, [activeIndex]);
+
+  // Поворот контейнера точек: активная в первой четверти (около -45°)
+  const dotsRef = useRef<HTMLDivElement | null>(null);
+  const rotationRef = useRef<{ val: number }>({ val: 0 });
+  const getAngleDeg = (i: number) => -90 + (360 / pts.length) * i; // как в генераторе
+  useEffect(() => {
+    const targetDeg = -45;
+    const currentDeg = getAngleDeg(activeIndex);
+    const targetRotation = targetDeg - currentDeg;
+
+    const el = dotsRef.current;
+    if (!el) return;
+
+    gsap.to(rotationRef.current, {
+      val: targetRotation,
+      duration: 0.8, // медленнее прокрутка
+      ease: 'power2.out',
+      onUpdate: () => {
+        const v = rotationRef.current.val;
+        el.style.setProperty('--rot', `${v}deg`);
+        el.style.setProperty('--counter-rot', `${-v}deg`);
+      },
+    });
+  }, [activeIndex, pts.length]);
+
   return (
     <section className="timeline" aria-labelledby="timeline-title">
       <div className="timeline__container">
         <h2 id="timeline-title" className="timeline__title">
           Исторические даты
         </h2>
+
         <div className="timeline__stage">
           <div className="timeline__years">
-            <span className="timeline__year timeline__year--left">{periods[activeIndex].from}</span>
-            <span className="timeline__year timeline__year--right">{periods[activeIndex].to}</span>
+            <span className="timeline__year timeline__year--left">
+              <span className="timeline__year-inner" ref={leftYearRef}>
+                {periods[activeIndex].from}
+              </span>
+            </span>
+            <span className="timeline__year timeline__year--right">
+              <span className="timeline__year-inner" ref={rightYearRef}>
+                {periods[activeIndex].to}
+              </span>
+            </span>
           </div>
           <div className="timeline__circle">
             <svg className="timeline__svg" viewBox="0 0 800 800">
               <circle className="timeline__ring" cx="400" cy="400" r="300" />
             </svg>
-            <div className="timeline__dots">
+            <div className="timeline__dots" ref={dotsRef}>
               {pts.map((p, i) => (
                 <span
                   key={i}
@@ -133,25 +211,22 @@ function App() {
                   style={{ left: `${(p.x / 800) * 100}%`, top: `${(p.y / 800) * 100}%` }}
                   onClick={() => setActiveIndex(i)}
                 >
-                  {i === activeIndex && (
-                    <span className="timeline__dot-num">{String(i + 1).padStart(2, '0')}</span>
-                  )}
+                  {i === activeIndex && <span className="timeline__dot-num">{i + 1}</span>}
                 </span>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Переключатель периодов над карточками */}
         <div className="timeline__switcher" role="group" aria-label="Переключение периода">
-          <div className="timeline__switcher-num">{`${String(activeIndex + 1).padStart(2, '0')}/${String(periods.length).padStart(2, '0')}`}</div>
+          <div className="timeline__switcher-num">{`${String(activeIndex + 1).padStart(2, '0')}/${String(total).padStart(2, '0')}`}</div>
           <div className="timeline__switcher-controls">
             <button
               type="button"
               className="timeline__switcher-btn"
               aria-label="Предыдущий период"
               onClick={goPrev}
-              disabled={activeIndex === 0}
+              disabled={isFirst}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden>
                 <path
@@ -169,7 +244,7 @@ function App() {
               className="timeline__switcher-btn"
               aria-label="Следующий период"
               onClick={goNext}
-              disabled={activeIndex === periods.length - 1}
+              disabled={isLast}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden>
                 <path
@@ -185,7 +260,6 @@ function App() {
           </div>
         </div>
 
-        {/* Внешние кнопки для слайдера слева/справа от его области */}
         <div className="timeline__slider-wrap">
           <button
             type="button"
@@ -208,7 +282,7 @@ function App() {
 
           <div className="timeline__slider">
             <Swiper
-              key={activeIndex} 
+              key={activeIndex}
               spaceBetween={100}
               slidesPerView={'auto'}
               slidesPerGroup={1}
@@ -225,6 +299,10 @@ function App() {
               onSlideChange={(sw) => bindEdges(sw)}
               navigation={{ prevEl: '.timeline-slider-prev', nextEl: '.timeline-slider-next' }}
               pagination={{ clickable: true }}
+              breakpoints={{
+                0: { spaceBetween: 16, slidesPerView: 'auto' as const },
+                601: { spaceBetween: 80, slidesPerView: 'auto' as const },
+              }}
               className="timeline-swiper"
             >
               {periods[activeIndex].events.map((event, i) => (

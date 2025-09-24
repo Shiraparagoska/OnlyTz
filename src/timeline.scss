@@ -1,10 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 
-
 body {
   margin: 0;
-  background: #f4f5f9; 
+  background: #f4f5f9;
   color: #42567a;
 }
 
@@ -22,9 +21,20 @@ body {
 }
 
 .timeline__container {
-  position: relative; 
+  position: relative;
   width: var(--layout);
   margin: 0 auto;
+  /* серые линии по краям контейнера (1px, 10% opacity) */
+  background-image: linear-gradient(
+    to right,
+    rgba(66, 86, 122, 0.1) 0,
+    rgba(66, 86, 122, 0.1) 1px,
+    transparent 1px,
+    transparent calc(100% - 1px),
+    rgba(66, 86, 122, 0.1) calc(100% - 1px),
+    rgba(66, 86, 122, 0.1) 100%
+  );
+  background-repeat: no-repeat;
 }
 
 .event-card__year {
@@ -33,24 +43,22 @@ body {
   font-size: 25px;
   line-height: 120%;
   letter-spacing: 0;
-  color: #3877ee; 
+  color: #3877ee;
   margin: 0 0 8px;
 }
-
 
 .timeline__container::before {
   content: '';
   position: absolute;
-  left: 0; 
+  left: 0;
   top: var(--stage-top);
-  transform: translateY(calc(-50% - 10%)); 
+  transform: translateY(calc(-50% - 10%));
   width: 5px;
   height: clamp(80px, 11vh, 120px);
   border-radius: 2.5px;
   background: linear-gradient(180deg, #3877ee 0%, #ef5da8 100%);
   pointer-events: none;
 }
-
 
 .timeline__title {
   position: absolute;
@@ -67,11 +75,9 @@ body {
   width: clamp(220px, 24vw, 350px);
 }
 
-
 .timeline__title::before {
   display: none !important;
 }
-
 
 .timeline__stage {
   position: relative;
@@ -79,7 +85,6 @@ body {
   aspect-ratio: 1 / 1;
   margin: var(--stage-top) auto 0;
 }
-
 
 .timeline__circle {
   position: absolute;
@@ -97,7 +102,6 @@ body {
   stroke: #dbe2f0;
   stroke-width: 2;
 }
-
 
 .timeline__years {
   position: absolute;
@@ -128,15 +132,16 @@ body {
   color: #ef5da8;
 }
 
-
 .timeline__dots {
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
+  transform: rotate(var(--rot, 0deg));
+  transform-origin: 50% 50%;
 }
 .timeline__dot {
-  position: absolute; 
+  position: absolute;
   transform: translate(-50%, -50%);
   width: 6px;
   height: 6px;
@@ -147,14 +152,46 @@ body {
   cursor: pointer;
   pointer-events: auto;
   z-index: 2;
+  transition: background 0.2s ease;
 }
 
+/* Плавное появление большого круга 56x56 */
+.timeline__dot::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 56px;
+  height: 56px;
+  transform: translate(-50%, -50%) scale(0.8);
+  border-radius: 50%;
+  background: #f4f5f9;
+  border: 1px solid rgba(48, 62, 88, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease,
+    border-color 0.2s ease;
+}
 
+/* Hover/active — плавное раскрытие */
+.timeline__dot:hover {
+  background: #f5f5f5;
+}
+.timeline__dot:hover::after,
+.timeline__dot.is-active::after {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Цифра остаётся над кругом */
 .timeline__dot-num {
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) rotate(var(--counter-rot, 0deg));
   z-index: 1;
   font-family: 'PT Sans', system-ui, sans-serif;
   font-weight: 400;
@@ -182,9 +219,8 @@ body {
   background: #f4f5f9;
   border: 1px solid rgba(48, 62, 88, 0.5);
   pointer-events: none;
-  z-index: 0; 
+  z-index: 0;
 }
-
 
 .timeline__dot:hover {
   background: #f5f5f5;
@@ -202,25 +238,22 @@ body {
   height: 135px;
 }
 
-
 .timeline-swiper .swiper-slide {
   width: clamp(300px, 27.8vw, 400px) !important;
   height: 135px !important;
   flex-shrink: 0;
 }
 
-
 .event-card {
   width: 100%;
   height: 135px;
-  padding: 12px 16px; 
+  padding: 12px 16px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   border: 0;
   box-shadow: none;
 }
-
 
 .event-card__year {
   font-family: 'Bebas Neue', system-ui, sans-serif;
@@ -231,7 +264,6 @@ body {
   color: #3877ee;
   margin: 0 0 8px;
 }
-
 
 .event-card__text {
   font-family: 'PT Sans', system-ui, sans-serif;
@@ -244,14 +276,12 @@ body {
   max-width: 100%;
 }
 
-
 .timeline__container .timeline__slider {
   position: relative;
   left: var(--title-left);
   width: calc(100% - (var(--title-left) * 2));
-  margin: clamp(24px, 5vh, 80px) 0 0; 
+  margin: clamp(24px, 5vh, 80px) 0 0;
 }
-
 
 .timeline__switcher {
   position: relative;
@@ -259,7 +289,7 @@ body {
   width: calc(100% - (var(--title-left) * 2));
   margin: clamp(16px, 3vh, 24px) 0 0;
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
   align-items: flex-start;
   gap: 8px;
 }
@@ -301,7 +331,6 @@ body {
   filter: saturate(50%);
 }
 
-
 .timeline__slider-wrap {
   position: relative;
   left: var(--title-left);
@@ -341,4 +370,174 @@ body {
 }
 .timeline-slider-nav:disabled {
   opacity: 0.5;
+}
+
+/* Направляющие линии */
+.timeline__container::after {
+  /* горизонтальная линия на уровне середины окружности */
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--stage-top) + (var(--circle) / 2) - 80px);
+  height: 1px; /* weight 1 */
+  background: #42567a;
+  opacity: 0.1; /* 10% */
+  pointer-events: none;
+}
+.timeline::after {
+  /* вертикальная линия по центру страницы */
+  content: '';
+  position: fixed;
+  left: 50vw;
+  top: 0;
+  bottom: 0;
+  width: 1px; /* weight 1 */
+  background: #42567a;
+  opacity: 0.1; /* 10% */
+  pointer-events: none;
+}
+
+/* Отступ заголовка/сцены 80px и вертикальный сдвиг переключателя */
+.timeline {
+  --stage-top: 80px;
+  --switcher-dy: 100px;
+}
+
+/* Перенос переключателей: у левого края лейаута на уровне центра круга + сдвиг */
+.timeline__switcher {
+  position: absolute;
+  left: var(--title-left); /* тот же отступ, что и у title */
+  top: calc(var(--stage-top) + (var(--circle) / 2) + var(--switcher-dy));
+  transform: translateY(-50%);
+  width: 120px; /* при необходимости подгоним */
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  z-index: 4;
+}
+
+/* Слайдер сразу под окружностью */
+.timeline__slider-wrap {
+  position: relative;
+  left: var(--title-left);
+  width: calc(100% - (var(--title-left) * 2));
+  margin-top: 16px; /* минимальный зазор под кругом */
+}
+
+/* Отступ между карточками 80 */
+.timeline-swiper {
+  --slide-gap: 80px;
+}
+
+/* карточка: высота 135, ширина авто чтобы влезало 3 шт. */
+.timeline-swiper .swiper-slide {
+  height: 135px !important;
+  width: auto !important;
+}
+.event-card {
+  height: 135px;
+}
+
+/* Делаем три карточки в ширину: ограничим max-width контейнера слайдов */
+@media (min-width: 1200px) {
+  .timeline__slider {
+    max-width: calc(3 * 400px + 2 * var(--slide-gap));
+  }
+}
+
+/* Мобильный адаптив */
+@media (max-width: 600px) {
+  .timeline {
+    --layout: calc(100vw - 32px);
+    --circle: min(70vw, 320px);
+    --stage-top: 48px;
+    --title-left: 16px;
+  }
+
+  .timeline__title {
+    font-size: 28px;
+  }
+
+  .timeline__years {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    width: 100%;
+    height: auto;
+    justify-content: flex-start;
+    gap: 16px;
+    margin-top: 16px;
+    margin-left: var(--title-left);
+  }
+  .timeline__year {
+    font-size: 56px;
+  }
+
+  /* подчеркивание/разделитель под годами */
+  .timeline__years::after {
+    content: '';
+    display: block;
+    height: 1px;
+    width: calc(100% - var(--title-left));
+    background: rgba(66, 86, 122, 0.2);
+    margin-top: 24px;
+  }
+
+  .timeline__stage {
+    width: 100%;
+    aspect-ratio: auto;
+    margin: 0;
+  }
+  .timeline__circle {
+    display: none;
+  }
+  .timeline__dots {
+    display: none;
+  }
+
+  .timeline__switcher {
+    position: static;
+    transform: none;
+    width: auto;
+    margin: 16px var(--title-left) 0;
+  }
+  .timeline__switcher-controls {
+    gap: 6px;
+  }
+
+  .timeline__slider-wrap {
+    left: var(--title-left);
+    width: calc(100% - var(--title-left) * 2);
+    margin-top: 16px;
+  }
+  .timeline-swiper .swiper-slide {
+    width: calc(100% - 32px) !important;
+    height: auto !important;
+  }
+  .event-card {
+    height: auto;
+    padding: 12px 16px 24px;
+    background: transparent;
+  }
+
+  /* Пагинация точки снизу */
+  .timeline__slider {
+    position: relative;
+  }
+  .timeline__slider .swiper-pagination {
+    position: static;
+    margin: 8px 0 16px;
+  }
+
+  /* Счётчик 06/06 внизу слева */
+  .timeline__counter-bottom {
+    margin: 8px 0 0;
+    font-size: 14px;
+    color: #42567a;
+    opacity: 0.8;
+  }
 }
